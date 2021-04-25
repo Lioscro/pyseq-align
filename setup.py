@@ -10,10 +10,38 @@ def read(path):
 
 long_description = read('README.md')
 
+include_dirs = ['pyseq_align/seq-align/src']
+extra_compile_args = ['-Wno-strict-prototypes', '-Wno-unused-variable', '-Wno-unused-function']
 to_cythonize = [
     Extension(
-        'pyseq_align.test',
-        ['pyseq_align/test.pyx'],
+        'pyseq_align.needleman_wunsch',
+        [
+            'pyseq_align/needleman_wunsch.pyx',
+            'pyseq_align/seq-align/src/alignment.c',
+            'pyseq_align/seq-align/src/alignment_scoring.c',
+            'pyseq_align/seq-align/src/needleman_wunsch.c',
+        ],
+        include_dirs=include_dirs,
+        extra_compile_args=extra_compile_args,
+    ),
+    Extension(
+        'pyseq_align.alignment',
+        [
+            'pyseq_align/alignment.pyx',
+            'pyseq_align/seq-align/src/alignment.c',
+            'pyseq_align/seq-align/src/alignment_scoring.c',
+        ],
+        include_dirs=include_dirs,
+        extra_compile_args=extra_compile_args,
+    ),
+    Extension(
+        'pyseq_align.scoring',
+        [
+            'pyseq_align/scoring.pyx',
+            'pyseq_align/seq-align/src/alignment_scoring.c',
+        ],
+        include_dirs=include_dirs,
+        extra_compile_args=extra_compile_args,
     ),
 ]
 

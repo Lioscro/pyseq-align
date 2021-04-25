@@ -24,3 +24,6 @@ cdef extern from '../seq-align/src/alignment.h':
         size_t len_a
         size_t len_b
         score_t score
+
+    cdef alignment_t* alignment_create(size_t capacity)
+    cdef void alignment_free(alignment_t* result)
