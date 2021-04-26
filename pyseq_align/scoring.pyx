@@ -30,8 +30,8 @@ cdef class Scoring:
         )
 
         # If substitution matrix was given, update the scoring using scoring_add_mutation
-        characters = sorted(substitution_matrix.keys())
         if substitution_matrix:
+            characters = sorted(substitution_matrix.keys())
             for c1 in substitution_matrix:
                 if len(c1) != 1:
                     raise Exception(f'All characters in substitution matrix must be length 1, but found `{c1}`')

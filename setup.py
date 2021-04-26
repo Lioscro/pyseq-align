@@ -1,6 +1,5 @@
 from setuptools import find_packages, Extension, setup
 from Cython.Build import cythonize
-from Cython.Distutils import build_ext
 
 
 def read(path):
@@ -10,8 +9,10 @@ def read(path):
 
 long_description = read('README.md')
 
-include_dirs = ['pyseq_align/seq-align/src']
-extra_compile_args = ['-Wno-strict-prototypes', '-Wno-unused-variable', '-Wno-unused-function']
+include_dirs = ['pyseq_align/seq-align/src', 'pyseq_align/seq-align/libs']
+extra_compile_args = [
+    '-Wno-strict-prototypes', '-Wno-unused-variable', '-Wno-unused-function'
+]
 to_cythonize = [
     Extension(
         'pyseq_align.needleman_wunsch',
@@ -20,6 +21,17 @@ to_cythonize = [
             'pyseq_align/seq-align/src/alignment.c',
             'pyseq_align/seq-align/src/alignment_scoring.c',
             'pyseq_align/seq-align/src/needleman_wunsch.c',
+        ],
+        include_dirs=include_dirs,
+        extra_compile_args=extra_compile_args,
+    ),
+    Extension(
+        'pyseq_align.smith_waterman',
+        [
+            'pyseq_align/smith_waterman.pyx',
+            'pyseq_align/seq-align/src/alignment.c',
+            'pyseq_align/seq-align/src/alignment_scoring.c',
+            'pyseq_align/seq-align/src/smith_waterman.c',
         ],
         include_dirs=include_dirs,
         extra_compile_args=extra_compile_args,
@@ -63,16 +75,14 @@ setup(
     setup_requires=['cython'],
     install_requires=read('requirements.txt').strip().split('\n'),
     ext_modules=cythonize(to_cythonize, language_level='3'),
-    entry_points={},
     classifiers=[
         'Intended Audience :: Science/Research',
         'License :: OSI Approved :: MIT License',
-        'Operating System :: POSIX :: Linux',
-        'Operating System :: MacOS',
-        'Operating System :: Microsoft :: Windows',
+        'Operating System :: OS Independent',
         'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: 3.8',
+        'Programming Language :: Python :: 3.9',
+        'Programming Language :: Cython',
         'Topic :: Scientific/Engineering :: Bio-Informatics',
-        'Topic :: Utilities',
     ],
 )

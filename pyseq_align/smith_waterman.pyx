@@ -2,11 +2,11 @@ from typing import Optional
 
 from .alignment cimport Alignment
 from .scoring cimport Scoring
-from .wrappers.needleman_wunsch cimport *
+from .wrappers.smith_waterman cimport *
 
 
-cdef class NeedlemanWunsch:
-    """Python interface for the Needleman-Wunsch global alignment implementation.
+cdef class SmithWaterman:
+    """Python interface for the Smith-Waterman local alignment implementation.
 
     Arguments
     ---------
@@ -35,7 +35,7 @@ cdef class NeedlemanWunsch:
     case_sensitive : bool, default: True
         characters are case-sensitive
     """
-    cdef nw_aligner_t* _pointer
+    cdef sw_aligner_t* _pointer
     cdef public Scoring scoring
 
     def __init__(
@@ -59,12 +59,12 @@ cdef class NeedlemanWunsch:
         )
 
     def __cinit__(self, *args, **kwargs):
-        self._pointer = needleman_wunsch_new()
+        self._pointer = smith_waterman_new()
         if not self._pointer:
             raise MemoryError('Failed to allocate memory')
 
     def __dealloc__(self):
-        needleman_wunsch_free(self._pointer)
+        smith_waterman_free(self._pointer)
 
     def align(self, str a, str b):
         """Align two sequences.
@@ -78,15 +78,22 @@ cdef class NeedlemanWunsch:
 
         Returns
         -------
-        result : Alignment object
-            alignment
+        results : list of Alignment objects
+            list of alignments
         """
         a_bytes = a.encode('UTF-8')
         b_bytes = b.encode('UTF-8')
         cdef char* a_chars = a_bytes
         cdef char* b_chars = b_bytes
         cdef scoring_t* scoring = self.scoring._pointer
-        cdef nw_aligner_t* nw = self._pointer
-        cdef Alignment result = Alignment(len(a) + len(b))
-        needleman_wunsch_align(a_chars, b_chars, scoring, nw, result._pointer)
-        return result
+        cdef sw_aligner_t* sw = self._pointer
+        cdef Alignment result
+        smith_waterman_align(a_chars, b_chars, scoring, sw)
+
+        results = []
+        while True:
+            result = Alignment(len(a) + len(b))
+            if smith_waterman_fetch(sw, result._pointer) == 0:
+                break
+            results.append(result)
+        return results
