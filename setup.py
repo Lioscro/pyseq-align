@@ -59,7 +59,7 @@ to_cythonize = [
 
 setup(
     name='pyseq-align',
-    version='0.0.1',
+    version='0.0.0',
     url='https://github.com/Lioscro/pyseq-align',
     author='Kyung Hoi (Joseph) Min',
     author_email='phoenixter96@gmail.com',
