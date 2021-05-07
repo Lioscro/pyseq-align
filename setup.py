@@ -67,7 +67,7 @@ setup(
     long_description=long_description,
     long_description_content_type='text/markdown',
     keywords='',
-    python_requires='>=3.7',
+    python_requires='>=3.6',
     license='MIT',
     packages=find_packages(exclude=('tests', 'docs')),
     zip_safe=False,
