@@ -8,6 +8,9 @@ from .wrappers.smith_waterman cimport *
 cdef class SmithWaterman:
     """Python interface for the Smith-Waterman local alignment implementation.
 
+    Note that the aligner object is allocated & initialized each time
+    `align` is called because this object contains the alignment state.
+
     Arguments
     ---------
     match : int, default: 1
@@ -58,15 +61,10 @@ cdef class SmithWaterman:
             no_mismatches, case_sensitive
         )
 
-    def __cinit__(self, *args, **kwargs):
-        self._pointer = smith_waterman_new()
-        if not self._pointer:
-            raise MemoryError('Failed to allocate memory')
-
     def __dealloc__(self):
         smith_waterman_free(self._pointer)
 
-    def align(self, str a, str b):
+    def align(self, str a, str b, int n=0):
         """Align two sequences.
 
         Arguments
@@ -75,12 +73,21 @@ cdef class SmithWaterman:
             first sequence
         b : str
             second sequence
+        n : int
+            number of alignments to return, ordered by alignment score.
+            defaults to 0, which returns all alignments
 
         Returns
         -------
         results : list of Alignment objects
             list of alignments
         """
+        if self._pointer:
+            smith_waterman_free(self._pointer)
+        self._pointer = smith_waterman_new()
+        if not self._pointer:
+            raise MemoryError('Failed to allocate memory')
+
         a_bytes = a.encode('UTF-8')
         b_bytes = b.encode('UTF-8')
         cdef char* a_chars = a_bytes
@@ -91,7 +98,7 @@ cdef class SmithWaterman:
         smith_waterman_align(a_chars, b_chars, scoring, sw)
 
         results = []
-        while True:
+        while n == 0 or len(results) < n:
             result = Alignment(len(a) + len(b))
             if smith_waterman_fetch(sw, result._pointer) == 0:
                 break

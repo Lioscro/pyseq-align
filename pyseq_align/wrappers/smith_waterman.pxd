@@ -25,4 +25,4 @@ cdef extern from '../seq-align/src/smith_waterman.h':
 
     cdef void smith_waterman_align(const char *seq_a, const char *seq_b,
                               const scoring_t *scoring, sw_aligner_t *sw)
-    cdef int smith_waterman_fetch(sw_aligner_t *sw, alignment_t *result);
+    cdef int smith_waterman_fetch(sw_aligner_t *sw, alignment_t *result)
