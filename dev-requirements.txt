@@ -6,4 +6,3 @@ pre-commit==2.4.0
 twine>=2.0.0
 wheel==0.34.2
 yapf==0.30.0
-Cython>=0.29.21
